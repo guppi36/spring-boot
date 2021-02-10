@@ -1,9 +1,10 @@
 package hiber.service;
 
-import hiber.dao.UserDao;
 import hiber.model.User;
+import hiber.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,32 +12,34 @@ import java.util.List;
 @Service
 public class UserServiceImp implements UserService {
 
-   @Autowired
-   private UserDao userDao;
+   private final UserRepository userRepository;
 
-   @Transactional
+   @Autowired
+   public UserServiceImp(UserRepository userRepository) {
+      this.userRepository = userRepository;
+   }
+
    @Override
    public void add(User user) {
-      userDao.add(user);
+      userRepository.save(user);
    }
 
-   @Transactional(readOnly = true)
    @Override
    public List<User> listUsers() {
-      return userDao.listUsers();
+      return userRepository.findAll();
    }
 
-   @Transactional
    @Override
-   public void delete(User user) { userDao.delete(user); }
+   public void delete(User user) { userRepository.delete(user); }
 
-   @Transactional
    @Override
-   public void update(User user) { userDao.update(user); }
+   public void update(User user) {
+      userRepository.deleteById(user.getId());
+      userRepository.save(user);
+   }
 
-   @Transactional
    @Override
    public User getUserByName(String username) {
-      return userDao.getUserByName(username);
+      return userRepository.findByUsername(username);
    }
 }

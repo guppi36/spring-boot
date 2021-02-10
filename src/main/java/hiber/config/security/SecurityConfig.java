@@ -1,4 +1,4 @@
-package web.config.security;
+package hiber.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,11 +15,10 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import web.config.handler.SuccessUserHandler;
+import hiber.config.handler.SuccessUserHandler;
 
 @Configuration
 @EnableWebSecurity
-@ComponentScan(value = "hiber")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService; // сервис, с помощью которого тащим пользователя

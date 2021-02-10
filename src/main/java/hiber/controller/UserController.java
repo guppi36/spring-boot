@@ -1,14 +1,13 @@
-package web.controller;
+package hiber.controller;
 
 
-import hiber.config.HiberConfig;
 import hiber.model.User;
 import hiber.service.UserService;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +18,15 @@ import java.util.List;
 @RequestMapping(value = "/user", method = RequestMethod.GET)
 public class UserController {
 
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping(value = "")
     public String printStart(ModelMap model) {
-        AnnotationConfigApplicationContext context =
-                new AnnotationConfigApplicationContext(HiberConfig.class);
-
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;
         if(principal instanceof UserDetails){
@@ -32,7 +35,6 @@ public class UserController {
             username = principal.toString();
         }
 
-        UserService userService = context.getBean(UserService.class);
         List<User> userList = new ArrayList<>();
         userList.add(userService.getUserByName(username));
         model.addAttribute("users", userList);

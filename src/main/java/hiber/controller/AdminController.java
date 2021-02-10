@@ -1,16 +1,14 @@
-package web.controller;
+package hiber.controller;
 
-import hiber.config.HiberConfig;
 import hiber.model.Role;
 import hiber.model.User;
 import hiber.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,17 +17,20 @@ import java.util.Set;
 @RequestMapping(value = "/admin")
 public class AdminController {
 
+    private final UserService userService;
+
+    @Autowired
+    public AdminController(UserService userService) {
+        this.userService = userService;
+    }
+
+
     @GetMapping(value = "/")
 	public String printStart(ModelMap model) {
-		AnnotationConfigApplicationContext context =
-				new AnnotationConfigApplicationContext(HiberConfig.class);
-
-		UserService userService = context.getBean(UserService.class);
-
 		List<User> userList = userService.listUsers();
 
 		model.addAttribute("users", userList);
-		return "index";
+		return "user-list";
 	}
 
    	@PostMapping(value = "/add")
@@ -37,9 +38,6 @@ public class AdminController {
 						   @RequestParam String email,
 						   @RequestParam String password,
 						   @RequestParam(defaultValue = "false") boolean isAdmin, ModelMap model) {
-		AnnotationConfigApplicationContext context =
-				new AnnotationConfigApplicationContext(HiberConfig.class);
-
 		User newUser = new User(username, email, password);
 		Set<Role> roles = new HashSet<>();
 		roles.add(Role.getUserRole());
@@ -47,37 +45,29 @@ public class AdminController {
 
 		newUser.setRoles(roles);
 
-		UserService userService = context.getBean(UserService.class);
 		userService.add(newUser);
 
 		List<User> userList = userService.listUsers();
 		model.addAttribute("users", userList);
-		return "index";
+		return "user-list";
 	}
 
 	@PostMapping(value = "/update")
 	public String updateUser(@ModelAttribute(value="user") User user, ModelMap model) {
-		AnnotationConfigApplicationContext context =
-				new AnnotationConfigApplicationContext(HiberConfig.class);
-
-		UserService userService = context.getBean(UserService.class);
 		userService.update(user);
 		List<User> userList = userService.listUsers();
 
 		model.addAttribute("users", userList);
-		return "index";
+		return "user-list";
 	}
 
 	@PostMapping(value = "/delete")
 	public String deleteUser(@ModelAttribute(value="user") User user, ModelMap model) {
-		AnnotationConfigApplicationContext context =
-				new AnnotationConfigApplicationContext(HiberConfig.class);
-		System.out.println(user);
-		UserService userService = context.getBean(UserService.class);
+        System.out.println(user);
 		userService.delete(user);
 		List<User> userList = userService.listUsers();
 
 		model.addAttribute("users", userList);
-		return "index";
+		return "user-list";
 	}
 }
